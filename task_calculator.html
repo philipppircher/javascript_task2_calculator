@@ -30,8 +30,8 @@
 
       <script>
           // Global variables
-          var str = "";
-          var val1 = 0;
+          var str = "0";
+          var values = []
           var op = "";
           var result = 0;
 
@@ -53,16 +53,35 @@
         }
 
         function refreshInputValueLabel(value){ 
-            /*
             if (str == "0"){
                 str = value;
             } else{
-                str += value;
+                str += value.toString();
             }
-            */
-            str += value;
 
             document.getElementById("inputValue").innerHTML = str;
+        }
+
+        function refreshResultLabel(){
+            document.getElementById("result").innerHTML = result;
+        }
+
+        function getChar(operator){
+
+            values.push (document.getElementById("inputValue").innerText);
+            
+
+            op = operator;
+
+            // Show in console variables
+            console.log("operator button: " + operator);
+            console.log("Str: " + str);
+            console.log(op);
+            resetInputValueLabel();
+            
+            if (values.length == 2){
+                executeOperation()
+            }
         }
 
         function resetInputValueLabel(){
@@ -70,27 +89,35 @@
             document.getElementById("inputValue").innerHTML = str;
         }
 
-        function getChar(operator){
+        function executeOperation(){
 
-            val1 = document.getElementById("inputValue").innerText;   // inner text -> a value like 1,2,3, ..
-            op = operator;
+            switch (op) {
 
-            // Show in console variables
-            console.log("operator button: " + operator);
-            console.log("val1: " + val1);
-            console.log("Str: " + str);
-            console.log(op);
-            getCalculation();
-            resetInputValueLabel();
-        }
-
-        function getCalculation(){
-            if (op == '+'){
-                eval(result += parseInt(val1));
+                case '+': 
+                    values.push(eval(parseInt(values[0]) + parseInt(values[1])));
+                    break;
+                case '-': 
+                    values.push(eval(parseInt(values[0]) - parseInt(values[1])));
+                    break;
+                case '*': 
+                    values.push(eval(parseInt(values[0]) * parseInt(values[1])));
+                    break;
+                case '/': 
+                    values.push(eval(parseInt(values[0]) / parseInt(values[1])));
+                    break;
+                case '%': 
+                    values.push(eval(parseInt(values[0]) % parseInt(values[1])));
+                    break;
+                case '=': 
+                    refreshResultLabel();
+                    break;
             }
-            if (op == '-'){
-                eval(result -= parseInt(val1));
-            }
+
+            result = values[2];
+            // After operation remove array elements
+            values = [result];
+            // Todo refresh  id="calculation" label
+            refreshResultLabel();
             console.log("result: " + result)
         }
       </script>
@@ -101,6 +128,8 @@
     <div class="labels">  
         <label id="calculation">0</label> 
         <br>
+        <label id="result">0</label> 
+        <br>
         <label id="inputValue">0</label> 
     </div>
     <br>
@@ -108,6 +137,9 @@
     <!--Buttons-->
     <!---->
     <div>
+        <br>
+        <br>
+        <br>
         <button type="button" onclick="checkChar(7)" id="7">7</button>
         <button type="button" onclick="checkChar(8)" id="8">8</button>
         <button type="button" onclick="checkChar(9)" id="9">9</button>
