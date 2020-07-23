@@ -30,18 +30,17 @@
 
       <script>
           // Global variables
-          var str = "0";
-          var values = []
-          var op = "";
-          var result = 0;
+          var str = "0";                    // concatened label text to a string, example value "99" in label inputValue
+          var values = [];                  // first input, second input, calculated result -> max to lenght 3 
+          var ops = [];                     // collect up to 2 elements of operations (needed to behave like windows calculator)
+          var result = 0;                   // saves new result value after evaluation
+          var isWaitingforValue = true;     // use this to prevent multiply use of op button calculations
 
         // Check type of Char
         function checkChar(value){
             if (typeof value === 'number'){
                 getNumber(value);
-            }
-
-            if (typeof value === 'string'){
+            } else if (typeof value === 'string' && !isWaitingforValue){
                 getChar(value);
             }
         }
@@ -53,8 +52,9 @@
         }
 
         function refreshInputValueLabel(value){ 
-            if (str == "0"){
+            if (isWaitingforValue){
                 str = value;
+                isWaitingforValue = false;
             } else{
                 str += value.toString();
             }
@@ -62,25 +62,22 @@
             document.getElementById("inputValue").innerHTML = str;
         }
 
-        function refreshResultLabel(){
+        function refreshLabels(){
             document.getElementById("result").innerHTML = result;
+            document.getElementById("inputValue").innerHTML = result;
+        }
+
+        function setOperator(operator){
+            ops.push(operator);
         }
 
         function getChar(operator){
+            ops.push(operator);
+            isWaitingforValue = true;
+            values.push( document.getElementById("inputValue").innerHTML);
 
-            values.push (document.getElementById("inputValue").innerText);
-            
-
-            op = operator;
-
-            // Show in console variables
-            console.log("operator button: " + operator);
-            console.log("Str: " + str);
-            console.log(op);
-            resetInputValueLabel();
-            
             if (values.length == 2){
-                executeOperation()
+                executeOperation();
             }
         }
 
@@ -90,36 +87,37 @@
         }
 
         function executeOperation(){
-
-            switch (op) {
+            switch (ops[0]) {
 
                 case '+': 
                     values.push(eval(parseInt(values[0]) + parseInt(values[1])));
                     break;
                 case '-': 
                     values.push(eval(parseInt(values[0]) - parseInt(values[1])));
-                    break;
-                case '*': 
+                    break;                        
+                case '*':
                     values.push(eval(parseInt(values[0]) * parseInt(values[1])));
                     break;
                 case '/': 
                     values.push(eval(parseInt(values[0]) / parseInt(values[1])));
-                    break;
+                    break;                       
                 case '%': 
                     values.push(eval(parseInt(values[0]) % parseInt(values[1])));
                     break;
                 case '=': 
-                    refreshResultLabel();
+                    refreshResultLabel();                        
                     break;
-            }
+                }
 
-            result = values[2];
-            // After operation remove array elements
-            values = [result];
-            // Todo refresh  id="calculation" label
-            refreshResultLabel();
-            console.log("result: " + result)
+                ops.shift();    // remove first element of array
+
+                result = values[2];
+                values = [result];  // Set values back to 1 element with result value
+
+                isWaitingforValue = true;
+                refreshLabels();
         }
+
       </script>
 </head>
 <body>
