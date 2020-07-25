@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Super-Fancy-Calculator</title>
+    <title>My Super-Fancy-Calculator ;)</title>
 
     <style>
     button {
@@ -22,37 +22,47 @@
       .labels {
           width: 330px;
           height: 100px;
-          font-size: 3em;
+          font-size: 2.5em;
           text-align: right;
+      }
+
+      div{
+          /*Add position in window of div here */
       }
 
       </style>
 
       <script>
           // Global variables
-          var str = "0";                    // concatened label text to a string, example value "99" in label inputValue
+          //
+          var str = "0";                    // concatened label text to a string, example value "99" in label "inputValue"
+          var concatString = "";            // concatened every input value or operator to a string and print it in label "calculation"
           var values = [];                  // first input, second input, calculated result -> max to lenght 3 
           var ops = [];                     // collect up to 2 elements of operations (needed to behave like windows calculator)
           var result = 0;                   // saves new result value after evaluation
           var isWaitingforValue = true;     // use this to prevent multiply use of op button calculations
 
-        // Check type of Char
         function checkChar(value){
             if (typeof value === 'number'){
                 getNumber(value);
             } else if (typeof value === 'string' && !isWaitingforValue){
                 getChar(value);
+                if (ops[0] == "="){
+                    refreshLabels();
+                }
             }
         }
 
-        // 
         function getNumber(num){
             console.log(num);
             refreshInputValueLabel(num);
         }
 
         function refreshInputValueLabel(value){ 
-            if (isWaitingforValue){
+
+            // First condition sets string to value instead of concatenade them together
+            // Second condition prevents "000" case ins string
+            if (isWaitingforValue || document.getElementById("inputValue").innerHTML == "0"){
                 str = value;
                 isWaitingforValue = false;
             } else{
@@ -63,8 +73,8 @@
         }
 
         function refreshLabels(){
-            document.getElementById("result").innerHTML = result;
             document.getElementById("inputValue").innerHTML = result;
+
         }
 
         function setOperator(operator){
@@ -76,9 +86,12 @@
             isWaitingforValue = true;
             values.push( document.getElementById("inputValue").innerHTML);
 
+            concatString += document.getElementById("inputValue").innerHTML + " " + ops[ops.length - 1];
+            document.getElementById("calculation").innerHTML = concatString;
+
             if (values.length == 2){
                 executeOperation();
-            }
+            } 
         }
 
         function resetInputValueLabel(){
@@ -86,36 +99,80 @@
             document.getElementById("inputValue").innerHTML = str;
         }
 
+        function resetCalculationLabel(){
+            document.getElementById("calculation").innerHTML = str;
+        }
+
+        function resetvars(){
+            str = "0";                   
+            concatString = "";            
+            values = [];                  
+            ops = [];                                
+            isWaitingforValue = true;  
+
+            resetInputValueLabel();
+            resetCalculationLabel  
+        }
+
+        function resetAll(){
+            str = "0";                   
+            concatString = "";            
+            values = [];                  
+            ops = [];                     
+            result = 0;                  
+            isWaitingforValue = true;  
+
+            resetInputValueLabel();
+            resetCalculationLabel  
+        }
+
         function executeOperation(){
             switch (ops[0]) {
 
                 case '+': 
-                    values.push(eval(parseInt(values[0]) + parseInt(values[1])));
+                    values.push(eval(parseFloat(values[0]) + parseFloat(values[1])));
                     break;
                 case '-': 
-                    values.push(eval(parseInt(values[0]) - parseInt(values[1])));
+                    values.push(eval(parseFloat(values[0]) - parseFloat(values[1])));
                     break;                        
                 case '*':
-                    values.push(eval(parseInt(values[0]) * parseInt(values[1])));
+                    values.push(eval(parseFloat(values[0]) * parseFloat(values[1])));
                     break;
                 case '/': 
-                    values.push(eval(parseInt(values[0]) / parseInt(values[1])));
+                    values.push(eval(parseFloat(values[0]) / parseFloat(values[1])));
                     break;                       
                 case '%': 
-                    values.push(eval(parseInt(values[0]) % parseInt(values[1])));
+                    values.push(eval(parseFloat(values[0]) % parseFloat(values[1])));
                     break;
-                case '=': 
-                    refreshResultLabel();                        
+                case '=':
+                    values[2] = result;     // TODO fix bug here..
+                    concatString = result;
+                    break;
+                case 'c':
+                    resetAll();
                     break;
                 }
 
-                ops.shift();    // remove first element of array
+                console.log("values[0]: " + values[0] + " values[1]: " + values[1]);
+
+                if (ops[1] == ""){
+                    ops = [];
+                } else {
+                    ops.shift();    // remove first element of array
+                }
 
                 result = values[2];
                 values = [result];  // Set values back to 1 element with result value
 
-                isWaitingforValue = true;
-                refreshLabels();
+                // Fix a bug -> if "=" selected, a new value can be entered in inputLabel
+                if (ops[0] != "="){
+                    isWaitingforValue = true;
+                    refreshLabels();    // implemented only refresh inputValue label yet..
+                }
+                else {
+                    isWaitingforValue = false;
+                }
+               
         }
 
       </script>
@@ -124,20 +181,14 @@
     <!--Labels-->
     <!---->
     <div class="labels">  
-        <label id="calculation">0</label> 
+        <label id="calculation">0</label>
         <br>
-        <label id="result">0</label> 
-        <br>
-        <label id="inputValue">0</label> 
+        <label id="inputValue">0</label>
     </div>
-    <br>
 
     <!--Buttons-->
     <!---->
-    <div>
-        <br>
-        <br>
-        <br>
+    <div id="userInterface">
         <button type="button" onclick="checkChar(7)" id="7">7</button>
         <button type="button" onclick="checkChar(8)" id="8">8</button>
         <button type="button" onclick="checkChar(9)" id="9">9</button>
