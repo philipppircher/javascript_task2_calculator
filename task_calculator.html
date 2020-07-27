@@ -41,6 +41,7 @@
           var ops = [];                     // collect up to 2 elements of operations (needed to behave like windows calculator)
           var result = 0;                   // saves new result value after evaluation
           var isWaitingforValue = true;     // use this to prevent multiply use of op button calculations
+          var isCalcLabelSetToResult = false;
 
         function checkChar(value){
             if (typeof value === 'number'){
@@ -48,7 +49,10 @@
             } else if (typeof value === 'string' && !isWaitingforValue){
                 getChar(value);
                 if (ops[0] == "="){
-                    refreshLabels();
+                    refreshInputValueLabelToResult();
+                }
+                if (isCalcLabelSetToResult){
+                    document.getElementById("calculation").innerHTML = result + " " + ops[0];
                 }
             }
         }
@@ -72,11 +76,6 @@
             document.getElementById("inputValue").innerHTML = str;
         }
 
-        function refreshLabels(){
-            document.getElementById("inputValue").innerHTML = result;
-
-        }
-
         function setOperator(operator){
             ops.push(operator);
         }
@@ -86,44 +85,15 @@
             isWaitingforValue = true;
             values.push( document.getElementById("inputValue").innerHTML);
 
-            concatString += document.getElementById("inputValue").innerHTML + " " + ops[ops.length - 1];
+            if (ops[0] != "="){
+                concatString += document.getElementById("inputValue").innerHTML + " " + ops[ops.length - 1];
+            }
+
             document.getElementById("calculation").innerHTML = concatString;
 
             if (values.length == 2){
                 executeOperation();
             } 
-        }
-
-        function resetInputValueLabel(){
-            str = "0";
-            document.getElementById("inputValue").innerHTML = str;
-        }
-
-        function resetCalculationLabel(){
-            document.getElementById("calculation").innerHTML = str;
-        }
-
-        function resetvars(){
-            str = "0";                   
-            concatString = "";            
-            values = [];                  
-            ops = [];                                
-            isWaitingforValue = true;  
-
-            resetInputValueLabel();
-            resetCalculationLabel  
-        }
-
-        function resetAll(){
-            str = "0";                   
-            concatString = "";            
-            values = [];                  
-            ops = [];                     
-            result = 0;                  
-            isWaitingforValue = true;  
-
-            resetInputValueLabel();
-            resetCalculationLabel  
         }
 
         function executeOperation(){
@@ -147,32 +117,26 @@
                 case '=':
                     values[2] = result;     // TODO fix bug here..
                     concatString = result;
+                    isCalcLabelSetToResult = true;
                     break;
                 case 'c':
                     resetAll();
                     break;
                 }
 
-                console.log("values[0]: " + values[0] + " values[1]: " + values[1]);
-
-                if (ops[1] == ""){
-                    ops = [];
-                } else {
-                    ops.shift();    // remove first element of array
-                }
+                ops.shift();    
 
                 result = values[2];
                 values = [result];  // Set values back to 1 element with result value
 
                 // Fix a bug -> if "=" selected, a new value can be entered in inputLabel
                 if (ops[0] != "="){
+                    refreshInputValueLabel(result);    // implemented only refresh inputValue label yet..
                     isWaitingforValue = true;
-                    refreshLabels();    // implemented only refresh inputValue label yet..
                 }
                 else {
-                    isWaitingforValue = false;
+                    refreshInputValueLabel(result);
                 }
-               
         }
 
       </script>
