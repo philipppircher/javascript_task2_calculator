@@ -49,10 +49,12 @@
             } else if (typeof value === 'string' && !isWaitingforValue){
                 getChar(value);
                 if (ops[0] == "="){
-                    refreshInputValueLabelToResult();
+                    refreshInputValueLabel();
                 }
                 if (isCalcLabelSetToResult){
                     document.getElementById("calculation").innerHTML = result + " " + ops[0];
+                    isCalcLabelSetToResult = false;
+                    isWaitingforValue = true;
                 }
             }
         }
@@ -69,8 +71,6 @@
             if (isWaitingforValue || document.getElementById("inputValue").innerHTML == "0"){
                 str = value;
                 isWaitingforValue = false;
-            } else{
-                str += value.toString();
             }
 
             document.getElementById("inputValue").innerHTML = str;
@@ -128,14 +128,11 @@
 
                 result = values[2];
                 values = [result];  // Set values back to 1 element with result value
-
+                refreshInputValueLabel(result);
                 // Fix a bug -> if "=" selected, a new value can be entered in inputLabel
                 if (ops[0] != "="){
-                    refreshInputValueLabel(result);    // implemented only refresh inputValue label yet..
+                       // implemented only refresh inputValue label yet..
                     isWaitingforValue = true;
-                }
-                else {
-                    refreshInputValueLabel(result);
                 }
         }
 
