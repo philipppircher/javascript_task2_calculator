@@ -48,13 +48,10 @@
                 getNumber(value);
             } else if (typeof value === 'string' && !isWaitingforValue){
                 getChar(value);
-                if (ops[0] == "="){
-                    refreshInputValueLabel();
-                }
+
                 if (isCalcLabelSetToResult){
                     document.getElementById("calculation").innerHTML = result + " " + ops[0];
                     isCalcLabelSetToResult = false;
-                    isWaitingforValue = true;
                 }
             }
         }
@@ -67,17 +64,15 @@
         function refreshInputValueLabel(value){ 
 
             // First condition sets string to value instead of concatenade them together
-            // Second condition prevents "000" case ins string
+            // Second condition prevents "00" case in inputLabel string
             if (isWaitingforValue || document.getElementById("inputValue").innerHTML == "0"){
                 str = value;
                 isWaitingforValue = false;
+            } else{
+                str += "" + value;
             }
 
             document.getElementById("inputValue").innerHTML = str;
-        }
-
-        function setOperator(operator){
-            ops.push(operator);
         }
 
         function getChar(operator){
@@ -85,12 +80,13 @@
             isWaitingforValue = true;
             values.push( document.getElementById("inputValue").innerHTML);
 
+            // Here is the calculationLabel error (concat 2 values to on number after first "=" operation)
             if (ops[0] != "="){
                 concatString += document.getElementById("inputValue").innerHTML + " " + ops[ops.length - 1];
-            }
+            } 
 
             document.getElementById("calculation").innerHTML = concatString;
-
+            isCalcLabelSetToResult = false;
             if (values.length == 2){
                 executeOperation();
             } 
